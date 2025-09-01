@@ -1,0 +1,3 @@
+[submodule "codebook"]
+	path = codebook
+	url = https://github.com/scorpiontornado/codebook
