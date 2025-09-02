@@ -1,3 +1,7 @@
+// Author: scorpiontornado
+// Created: 2025-09-02 3:30pm, solved in 4:07
+// Source: https://atcoder.jp/contests/abc421/tasks/abc421_a
+
 #include <bits/stdc++.h>
 using namespace std;
 

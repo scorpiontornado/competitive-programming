@@ -1,6 +1,6 @@
 // Author: scorpiontornado
-// Created: 2025-09-02 ~3:34pm, solved in 17:58 (from start)
-// Source: https://atcoder.jp/contests/abc421/tasks/abc421_b
+// Created: 2025-09-02 4:34pm
+// Source: https://atcoder.jp/contests/abc421/tasks/abc421_d
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -30,21 +30,14 @@ const ll LINF = 4e18;
 const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 
-// Python equivalent: int(reversed(str(x)))
-ll f(ll x) {
-    // TODO: fancy / 10, % 10 stuff to reverse it.. meh!
-    string s = to_string(x);
-    reverse(all(s));
-    return stoll(s);
-}
-
 void solve() {
-    vll a(11);
-    cin >> a[1] >> a[2];
+    ll rt, ct, ra, ca;
+    cin >> rt >> ct >> ra >> ca;
 
-    repi(i, 3, 10) { a[i] = f(a[i - 1] + a[i - 2]); }
+    ll n, m, l;
+    cin >> n >> m >> l;
 
-    cout << a[10] << "\n";
+    // TODO.... complexity? can't simulate all moves. 4:44:10pm moving on
 }
 
 int main() {

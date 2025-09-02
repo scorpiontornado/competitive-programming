@@ -1,4 +1,9 @@
+// Author: scorpiontornado
+// Created: 2025-09-02 ~3:48pm
+// Source: https://atcoder.jp/contests/abc421/tasks/abc421_c
+
 // TODO: fix... WA x3, TLE x2 (~4:11pm, started @ 3:30pm, 2 Sep 2025)
+// 4:27/28pm, breaking case: ABBABA.... 4:30:00pm swapping to D, 40 min left
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -37,12 +42,14 @@ void solve() {
 
     // Inspired by bubble sort
     for (int i = 1; i < sz(s); i++) {  // [0, i) is "sorted"
+        cerr << s[i] << ' ' << s[i-1] << '\n'; //! debug
         if (s[i] == s[i - 1]) {
             // Find first one that's different & swap it down to position i
             int j = i + 1;
             while (j < sz(s) && s[i] == s[j]) {
                 j++;
             }
+            cerr << i << ' ' << j << '\n'; //! debug
             // XXX: what if can't find within n?
             assert(j < sz(s) && s[i] != s[j]);  //! check
 
