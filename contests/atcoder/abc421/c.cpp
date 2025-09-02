@@ -1,3 +1,5 @@
+// TODO: fix... WA x3, TLE x2 (~4:11pm, started @ 3:30pm, 2 Sep 2025)
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -28,17 +30,30 @@ const int MOD = 1e9 + 7;
 
 void solve() {
     int n;
-    cin >> n;
+    string s;  // length: 2n (n of 'A', n of 'B')... using sz(s) is safer though
+    cin >> n >> s;
 
-    vector<string> s(n + 1);
+    ll swaps = 0;
 
-    repi(i, 1, n) { cin >> s[i]; }
+    // Inspired by bubble sort
+    for (int i = 1; i < sz(s); i++) {  // [0, i) is "sorted"
+        if (s[i] == s[i - 1]) {
+            // Find first one that's different & swap it down to position i
+            int j = i + 1;
+            while (j < sz(s) && s[i] == s[j]) {
+                j++;
+            }
+            // XXX: what if can't find within n?
+            assert(j < sz(s) && s[i] != s[j]);  //! check
 
-    int x;
-    string y;
-    cin >> x >> y;
+            // Takes j-i swaps between adjacent elements to move s[j] to pos i
+            // (can just swap directly as s[i..<j] is the same)
+            swaps += j - i;
+            swap(s[i], s[j]);
+        }
+    }
 
-    cout << (s[x] == y ? "Yes\n" : "No\n");
+    cout << swaps << "\n";
 }
 
 int main() {

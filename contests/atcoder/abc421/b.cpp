@@ -26,19 +26,21 @@ const ll LINF = 4e18;
 const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 
+// Python equivalent: int(reversed(str(x)))
+ll f(ll x) {
+    // TODO: fancy / 10, % 10 stuff to reverse it.. meh!
+    string s = to_string(x);
+    reverse(all(s));
+    return stoll(s);
+}
+
 void solve() {
-    int n;
-    cin >> n;
+    vll a(11);
+    cin >> a[1] >> a[2];
 
-    vector<string> s(n + 1);
+    repi(i, 3, 10) { a[i] = f(a[i - 1] + a[i - 2]); }
 
-    repi(i, 1, n) { cin >> s[i]; }
-
-    int x;
-    string y;
-    cin >> x >> y;
-
-    cout << (s[x] == y ? "Yes\n" : "No\n");
+    cout << a[10] << "\n";
 }
 
 int main() {
