@@ -1,13 +1,9 @@
 // Author: scorpiontornado
-// Created: 2025-09-03 10:22pm (upsolve)
+// Created: 2025-09-02 ~3:48pm
 // Source: https://atcoder.jp/contests/abc421/tasks/abc421_c
 
-// GG, returns 1 for AABBBA... wait why??? ... fixed now?
-// Then failed 1 sample & 9 of 16 unseen tests... (AAABBB -> 2, exp 3)
-// omg !!! forgot brackets around (a_num * 2 + 1) lol... resubmit!
-//  - nvm, ABBAAB returns 0??? It's neither ABABAB nor BABABA.... how???
-//  - nvm, forgot 3 in input haha... resubmit, 11:21pm (playing OverWatch too)
-//  - accepted!! Let's gooo!!
+// TODO: fix... WA x3, TLE x2 (~4:11pm, started @ 3:30pm, 2 Sep 2025)
+// 4:27/28pm, breaking case: ABBABA.... 4:30:00pm swapping to D, 40 min left
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -42,25 +38,28 @@ void solve() {
     string s;  // length: 2n (n of 'A', n of 'B')... using sz(s) is safer though
     cin >> n >> s;
 
-    ll delta1 = 0;  // difference in 'A' positions vs ABABAB...
-    ll delta2 = 0;  // difference in 'A' positions vs BABABA...
-    int a_num = 0;  // how many 'A's have been seen so far
+    ll swaps = 0;
 
-    for (int i = 0; i < sz(s); i++) {
-        if (s[i] == 'A') {
-            // delta1 += abs(i / 2 - a_num);  // 'A' should be at even indices
-            // delta2 += abs((i / 2 + 1) - a_num);  // 'A' should be at odd
-            // indices
+    // Inspired by bubble sort
+    for (int i = 1; i < sz(s); i++) {  // [0, i) is "sorted"
+        cerr << s[i] << ' ' << s[i-1] << '\n'; //! debug
+        if (s[i] == s[i - 1]) {
+            // Find first one that's different & swap it down to position i
+            int j = i + 1;
+            while (j < sz(s) && s[i] == s[j]) {
+                j++;
+            }
+            cerr << i << ' ' << j << '\n'; //! debug
+            // XXX: what if can't find within n?
+            assert(j < sz(s) && s[i] != s[j]);  //! check
 
-            delta1 += abs(i - a_num * 2);
-            delta2 += abs(i - (a_num * 2 + 1));
-            // cerr << i << ' ' << a_num << endl;  //! debug
-
-            a_num++;
+            // Takes j-i swaps between adjacent elements to move s[j] to pos i
+            // (can just swap directly as s[i..<j] is the same)
+            swaps += j - i;
+            swap(s[i], s[j]);
         }
     }
 
-    ll swaps = min(delta1, delta2);
     cout << swaps << "\n";
 }
 
