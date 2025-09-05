@@ -1,6 +1,6 @@
 // Author: scorpiontornado
-// Created: 2025-09-05 9:10pm
-// Source: https://atcoder.jp/contests/abc419/tasks/abc419_a
+// Created: 2025-09-05 9:13pm
+// Source: https://atcoder.jp/contests/abc419/tasks/abc419_b
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -31,17 +31,23 @@ const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 
 void solve() {
-    string s;
-    cin >> s;
-    // XXX: switch? Not enum...
-    if (s == "red") {
-        cout << "SSS\n";  // XXX: output var?
-    } else if (s == "blue") {
-        cout << "FFF\n";
-    } else if (s == "green") {
-        cout << "MMM\n";
-    } else {
-        cout << "Unknown\n";
+    int q;
+    cin >> q;
+
+    multiset<int> balls;
+    while (q--) {
+        int type, x;
+        cin >> type;
+
+        if (type == 1) {
+            cin >> x;
+            balls.insert(x);
+        } else { // 2
+            // guaranteed balls isn't empty
+            auto min_it = balls.begin();
+            cout << *min_it << '\n';
+            balls.erase(min_it);
+        }
     }
 }
 
