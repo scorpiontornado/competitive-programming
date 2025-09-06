@@ -79,7 +79,7 @@
 //  - I remember deriving it intuitively by thinking about examples, but can do:
 //      x + d ≡ 0   (mod M)
 //          d ≡ -x  (mod M)
-//          d = ((-x % M) + M) % M
+//*         d = ((-x % M) + M) % M
 //  - Test...
 //      - M = 4, x = 4 -> d = ((-4 % 4) + 4) % 4 = 0, yep!
 //      - M = 4, x = 5 -> d = ((-5 % 4) + 4) % 4 = (-1 + 4) % 4 = 3, yep!
@@ -90,6 +90,9 @@
 //      - wait nvm, that means (-A[i] % M) + M will be in the range (0, M]
 //        rather than [0, M), hence the last % M.
 //  - 7:11pm, impl DP? Gonna be annoying, idk how ppl did this so quickly
+//* - btw other thing was precomputing deltas/increments for a given residual
+//    for each group, but should be fine without it as 1<=N,M<=500 and 1<=L<=N.
+//  - 7:18pm dinner
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -119,9 +122,21 @@ const ll LINF = 4e18;
 const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 
+// ---
+
+const int N = 500;
+
 void solve() {
-    int n, m;
-    cin >> n >> m;
+    int n, m, l;
+    cin >> n >> m >> l;
+
+    vi A(N + 1);  // 1-indexed sequence
+
+    repi(i, 1, n) { cin >> A[i]; }
+
+    // TODO: precompute deltas?
+
+    // TODO: dp
 }
 
 int main() {
