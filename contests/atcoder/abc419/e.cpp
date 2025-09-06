@@ -31,6 +31,66 @@
 //    overlaps with other windows... complex .... 10:47pm
 //  - 10:48:45pm, given up, read editorial. 1 min left on virtual participation
 
+// 2025-09-06 ~~2:21pm~~ 2:55pm, upsolve!
+//  - Uploaded problem statement, editorial, & my thoughts to chatgpt last
+//    night, didn't read editorial, told it to give me hints. After ~2 hours(?),
+//    managed to fully get the DP.
+//  - Will now solve without looking at the chat to embed the learning! 2:58pm.
+//  - 3:28pm, distracted, back! (see next "paragraph", starting with OBS etc)
+//      - Fixed, had L+1 elements in each window not L, giving A_i+A{i+L+1} ≡ 0
+//      - Also, should be - not + (was wondering why I got A_i ≡ -A_{i+L})
+//  - 3:39pm, 4h 28m sleep last night, 4h 10m the night before rly catching up
+//    to me... (7h 22 avg 31 aug - 6 sep, 6h 30 24-30 aug)...
+//  - onto OBS #4, 3:41pm - music off. Basically re-solving the problem atp!
+//  - 4:12pm, writing out recurrence... nah, break
+
+// OBS: first window must be a multiple of M: A_1 + A_2 + ... + A_L ≡ 0 (mod M)
+// OBS: all contiguous windows (of length L) must be multiples of M, so:
+//      A_i + A_{i+1} +      ...      + A_{i+L-1}           ≡ 0    (mod M), and
+//            A_{i+1} + A_{i+2} + ... + A_{i+L-1} + A_{i+L} ≡ 0    (mod M)
+//      subtracting the two congruences, we get A_i - A_{i+L} ≡ 0  (mod M)
+// OBS: A_i - A_{i+L} ≡ 0 (mod M) implies A_i ≡ A_{i+L} (mod M).
+// OBS: after choosing the (increments/deltas for the) first window, the (deltas
+//      for the) rest of the sequence is fixed - choose lowest that makes it
+//      congruent to the element L before it (forming L "groups" of size N/L).
+// IDEA: test all combinations of deltas for the first window (i=1..L), skip if
+//      sum(A[i] + D[i]) % M != 0, then calculate deltas for rest of sequence.
+//      Return the min total sum of deltas given a particular first window.
+// OBS: after choosing deltas D[i] for i=1..L-1, D[L] is forced, as sum must be
+//      divisible by M: (sum_{i=1..L-1}(A[i] + D[i])) + (A[L] + D[L])) mod M = 0
+// OBS: D[i] is free for i = 1..L-1, can be any integer in [0, M).
+// OBS: redundancy in bruteforce (overlapping subproblems - motivating DP):
+//  1. to make first window sum to M, last item only needs to know the sum of
+//     the previous items (actually just its "residual", sum mod M ∈ [0, M)).
+//  2. second last item just needs to know the residual sum of the elements
+//     before it to pass on the new residual sum to the last element
+//  3. and so on, just need to know index, i, & residual sum, r, of [1, i) - no
+//     need to know the exact D[1..i-1]. There may be multiple ways of reaching
+//     the same residual sum using different D[1..i-1], but D[i] (and beyond)
+//     can be calculated the same way in each case -> cache solutions, DP!
+
+// 6:52pm, back, ceebs writing out the rest, see ChatGPT chat for DP explanation
+// (subproblem, state, recurrence, base case, overall solution)
+//  - only theoretical observation left to re-derive is how much to increment
+//  - e.g. if M=4, have 1 (or 5, or 9 etc), need to increment by 3 (delta = 3)
+//  - and if we have 0, 4, 8 etc, delta = 0. And for 2, 6, 10 etc, delta=2, etc
+//  - i.e., given current value x, we want to find the smallest positive integer
+//    d such that (x + d) mod M = 0.
+//  - I remember deriving it intuitively by thinking about examples, but can do:
+//      x + d ≡ 0   (mod M)
+//          d ≡ -x  (mod M)
+//          d = ((-x % M) + M) % M
+//  - Test...
+//      - M = 4, x = 4 -> d = ((-4 % 4) + 4) % 4 = 0, yep!
+//      - M = 4, x = 5 -> d = ((-5 % 4) + 4) % 4 = (-1 + 4) % 4 = 3, yep!
+//          - fun fact: (-5 % 4) is -1 in C/C++, but 3 in Python (based)
+//      - M = 4, x = 6, -> d = ((-6 % 4) + 4) % 4 = (-2 + 4) % 4 = 2
+//  - In fact, I posit that the final % M is unnecessary, as A[i] >= 0 so
+//    (-A[i] % M) will always be in the range (-M, 0]
+//      - wait nvm, that means (-A[i] % M) + M will be in the range (0, M]
+//        rather than [0, M), hence the last % M.
+//  - 7:11pm, impl DP? Gonna be annoying, idk how ppl did this so quickly
+
 #include <bits/stdc++.h>
 using namespace std;
 
