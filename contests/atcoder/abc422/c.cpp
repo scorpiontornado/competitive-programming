@@ -20,6 +20,19 @@
 //  - 3:29pm got it!! idk how i missed, but take 2* off A in AAC
 //  - 3:32pm 16 min rem, still ACx1, WAx13...????? Passing sample is annoying af
 
+// TIME: 9:29pm, randomly had a thought... if nc > na, swap them (to process the
+//       more numerous one first, after the B's)
+//  - see obsidian daily note for final thoughts before end of contest, tldr
+//    found breaking case 2 mins before end of contest (7 0 6 gives 4, but 6 0 7
+//    gives 3, as does 6 0 6)
+//      -  Should be symmetrical, can swap A & C without changing the result
+//      - -> made me think, why not actually swap them? It was a good idea
+//         earlier to process the more numerous one first, but I just did one or
+//         the other - AAC or ACC - after ABC. No need to report number of each
+//  - btw - during the contest, solved A & B, rank: 4427, performance: 342
+
+// TIME: 9:45pm, gg, WA on random (non-sample) cases again... now 1300ms vs 40??
+
 #pragma region template
 #include <bits/stdc++.h>
 using namespace std;
@@ -67,17 +80,19 @@ void solve() {
     //     ans += min(nc / 2, na);
     // }
 
-    // ??? order doesn't matter, right?
+    // ??? order doesn't matter, right? -> foreshadowing... (it does)
+    if (nc > na) swap(na, nc);  //* if more C's, do ACC before AAC
+
     ll aac = min(na / 2, nc);
     ans += aac;
     na -= aac * 2;
-    nc -= aac; //! BUG: forgot * 2.. then separated to separate lines, paranoia
+    nc -= aac;  //! BUG: forgot * 2.. then separated to separate lines, paranoia
 
     ll acc = min(na, nc / 2);
     ans += acc;
 
     cout << ans << '\n';
-    cerr << abc << ' ' << aac << ' ' << acc << endl; //! dbg
+    cerr << abc << ' ' << aac << ' ' << acc << endl;  //! dbg
 }
 
 int main() {
