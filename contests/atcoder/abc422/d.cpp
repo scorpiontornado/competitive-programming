@@ -34,7 +34,7 @@ const int INF = 1e9;  // numeric_limits<int>::max();
 const ll LINF = 4e18;
 const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
-#pragma endregion
+#pragma endregion template
 
 void solve() {
     
