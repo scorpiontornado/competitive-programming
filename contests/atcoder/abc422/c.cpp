@@ -2,6 +2,8 @@
 // Created: 2025-09-07 11:16pm, upsolve (full rewrite after c_fix.cpp failed)
 // Source: https://atcoder.jp/contests/abc422/tasks/abc422_c
 
+// 11:33pm, testing. Not 100% convinced, but it's worth a shot...
+
 #pragma region template
 #include <bits/stdc++.h>
 using namespace std;
@@ -32,7 +34,39 @@ const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 #pragma endregion template
 
-void solve() {}
+void solve() {
+    int na, nb, nc;
+    cin >> na >> nb >> nc;
+
+    // Take as many ABC as possible
+    int ans = min({na, nb, nc});
+    na--, nb--, nc--;
+
+    // Take AAC or ACC until delta == 0 (i.e. na == nc), or one of them is 0
+    int delta = na - nc;
+
+    if (delta > 0) {  // more A's
+        int aac = min({delta, na / 2, nc});
+        ans += aac;
+        na -= aac * 2;
+        nc -= aac;
+    } else if (delta < 0) {  // more C's
+        int acc = min({-delta, na, nc / 2});
+        ans += acc;
+        na -= acc;
+        nc -= acc * 2;
+    }
+
+    assert(na == nc || na == 0 || nc == 0);
+
+    // Alternate taking AAC and ACC until na == 0 or nc == 0
+    if (na > 0 && nc > 0) {
+        // Take complete groups of 3 (implicit floor), valid because na == nc
+        ans += (na + nc) / 3;
+    }
+
+    cout << ans << '\n';
+}
 
 int main() {
     ios::sync_with_stdio(false);
@@ -40,7 +74,7 @@ int main() {
     cout << fixed << setprecision(15);
 
     int t = 1;
-    // cin >> t;
+    cin >> t;
 
     while (t--) {
         solve();
