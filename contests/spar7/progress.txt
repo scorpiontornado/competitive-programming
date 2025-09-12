@@ -1,0 +1,13 @@
+During contest (90 mins):
+- witches (solved in first 5 mins?)
+- doodle (broken - TLE, despite 10^5 enemies * 106 moves << 10 sec?)
+- neologism (took a while to impl, needed directed cycle detection lec code)
+- slime (solved on paper 30 mins in, coded up at min ~75-88)
+
+After contest:
+- doodle (optimised using jump table)
+
+TODO:
+- sublet
+- dark
+- flowers
