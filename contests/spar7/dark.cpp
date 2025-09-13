@@ -56,6 +56,10 @@ double dist2(pt p, pt q) { return dot(p - q, p - q); }
 double cross(pt p, pt q) { return p.x * q.y - p.y * q.x; }
 // 2 more min, nearly 4:46pm
 
+ostream &operator<<(ostream &os, const pt &p) {
+    return os << "(" << p.x << "," << p.y << ")";
+}
+
 // circle centred at c, radius r
 vector<pt> circle_line_intersection(pt a, pt b, pt c, double r) {
     //? lowkey no idea how this works
@@ -89,12 +93,14 @@ pt rotateCCW(pt p, double t, pt o) {
 }
 // 5:13pm, 22 min so far... onto main I/O
 
-//! only compares x-coords, bit scuffed ngl, might not work properly
-bool within_segment(pt p, pt start, pt end) {
-    // TODO: generalise code to 1D projections on the segment rather than
-    //       needing to rotate it to be horizontal
-    return p.x + EPS >= start.x && p.x - EPS <= end.x;
-}
+// //! only compares x-coords, bit scuffed ngl, might not work properly
+// bool within_segment(pt p, pt start, pt end) {
+//     // TODO: generalise code to 1D projections on the segment rather than
+//     //       needing to rotate it to be horizontal
+//     cerr << "within_segment: " << p << ", " << start << ", " << end
+//          << '\n';  //! dbg
+//     return p.x + EPS >= start.x && p.x - EPS <= end.x;
+// }
 
 // Tests whether it's possible to cover the segment [`start`, `end`] using
 // circles of radius `r` & centered at `centres`.
@@ -107,10 +113,10 @@ bool check(double r, pt &start, pt &end, vector<pt> &centres) {
     vector<pair<pt, pt>> intersections;
     for (pt &c : centres) {
         auto intersect = circle_line_intersection(start, end, c, r);
-        auto filtered = intersect | views::filter([&](pt p) {
-                            return within_segment(p, start, end);
-                        });  //! check this works on moodle runner? C++20
-        intersect = vector(all(filtered));
+        // auto filtered = intersect | views::filter([&](pt p) {
+        //                     return within_segment(p, start, end);
+        //                 });  //! check this works on moodle runner? C++20
+        // intersect = vector(all(filtered));
 
         if (intersect.size() == 1) {
             intersections.emplace_back(intersect[0], intersect[0]);
@@ -123,11 +129,15 @@ bool check(double r, pt &start, pt &end, vector<pt> &centres) {
     }
 
     sort(all(intersections));
-    double seen_until = start.x;
+    double seen_until = start.x;  // XXX: what if start & end are the same?
     for (const auto &[a, b] : intersections) {
+        // cerr << a << ' ' << b << '\n';  //! dbg
+
         // check same y-coordinate as start, & that a is left of b
-        assert(abs(a.y - start.y) < EPS && abs(b.y - start.y) < EPS);
-        assert(a.x + EPS < b.x);
+        // assert(abs(a.y - start.y) < EPS && abs(b.y - start.y) < EPS);
+        assert(a.x < b.x + EPS);
+
+        if (a.x > end.x) break;
 
         if (seen_until + EPS < a.x) {
             // gap in segment that's not covered (between seen_until & a.x)
@@ -198,6 +208,6 @@ int main() {
     // zone & check union of all of them = original segment (perhaps >=)
     //  - should be easier given the segment is now horizontal? take min of left
     //    points, max of right points
-    assert(best_so_far != -1);
+    assert(best_so_far > -EPS);
     cout << best_so_far << '\n';
 }
