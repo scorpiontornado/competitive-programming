@@ -1,4 +1,6 @@
-// Upsolving at 4:50pm, 2025-09-13. Came up w idea last night.
+// Upsolving at 4:50pm, 2025-09-13. Came up w idea last night. Either use:
+//  - codebook code for distance from point (centre) to segment, or
+//  - codebook code for circle line intersection
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -37,6 +39,10 @@ struct pt {
         //! untested, careful of floating point comparisons (-Wfloat-equal)
         // basically `x < p.x || (x == p.x && y < p.y)`
         return x + EPS < p.x || (x - p.x < EPS && y + EPS < p.y);
+
+        //! "Avoid pt::operator< with EPS inside; it can break strict weak
+        //! ordering and make sort undefined. When working in 1D with [tL, tR]
+        //! you sort by doubles directly." - Copilot (GPT-5)
     }
     // partial_ordering operator<=>(const pt &p) const {
     //     return pair<double, double>(x, y) <=> pair<double, double>(p.x, p.y);
@@ -83,6 +89,13 @@ pt rotateCCW(pt p, double t, pt o) {
 }
 // 5:13pm, 22 min so far... onto main I/O
 
+//! only compares x-coords, bit scuffed ngl, might not work properly
+bool within_segment(pt p, pt start, pt end) {
+    // TODO: generalise code to 1D projections on the segment rather than
+    //       needing to rotate it to be horizontal
+    return p.x + EPS >= start.x && p.x - EPS <= end.x;
+}
+
 // Tests whether it's possible to cover the segment [`start`, `end`] using
 // circles of radius `r` & centered at `centres`.
 bool check(double r, pt &start, pt &end, vector<pt> &centres) {
@@ -94,6 +107,10 @@ bool check(double r, pt &start, pt &end, vector<pt> &centres) {
     vector<pair<pt, pt>> intersections;
     for (pt &c : centres) {
         auto intersect = circle_line_intersection(start, end, c, r);
+        auto filtered = intersect | views::filter([&](pt p) {
+                            return within_segment(p, start, end);
+                        });  //! check this works on moodle runner? C++20
+        intersect = vector(all(filtered));
 
         if (intersect.size() == 1) {
             intersections.emplace_back(intersect[0], intersect[0]);
@@ -181,6 +198,6 @@ int main() {
     // zone & check union of all of them = original segment (perhaps >=)
     //  - should be easier given the segment is now horizontal? take min of left
     //    points, max of right points
-
+    assert(best_so_far != -1);
     cout << best_so_far << '\n';
 }
