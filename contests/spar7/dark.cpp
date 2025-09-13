@@ -26,12 +26,22 @@ double EPS = 1e-12;
 struct pt {
     double x, y;
     pt() {}
-    pt(double x, double y) : x(x), y(y) {}
+    pt(double _x, double _y) : x(_x), y(_y) {}
     pt(const pt &p) : x(p.x), y(p.y) {}
+    // TODO: operator=
     pt operator+(const pt &p) const { return pt(x + p.x, y + p.y); }
     pt operator-(const pt &p) const { return pt(x - p.x, y - p.y); }
     pt operator*(double c) const { return pt(x * c, y * c); }  //! c, not p
     pt operator/(double c) const { return pt(x / c, y / c); }  //! c, not p
+    bool operator<(const pt &p) const {
+        //! untested, careful of floating point comparisons (-Wfloat-equal)
+        // basically `x < p.x || (x == p.x && y < p.y)`
+        return x + EPS < p.x || (x - p.x < EPS && y + EPS < p.y);
+    }
+    // partial_ordering operator<=>(const pt &p) const {
+    //     return pair<double, double>(x, y) <=> pair<double, double>(p.x, p.y);
+    //     //! issue with EPS n whatnot?
+    // }
 };
 // 3 min to copy out
 
@@ -73,35 +83,48 @@ pt rotateCCW(pt p, double t, pt o) {
 }
 // 5:13pm, 22 min so far... onto main I/O
 
-// 5:25pm... now ~~5:39pm~~ 5:47pm, finally got the binary search on reals?
-// https://codeforces.com/blog/entry/73888
-// https://codeforces.com/blog/entry/63085?#comment-470021
-double binarysearch(function<bool(double)> f) {
-    //? 2e5 should be large enough right?
-    double lo = 0, hi = 200200, best_so_far = -1;
+// Tests whether it's possible to cover the segment [`start`, `end`] using
+// circles of radius `r` & centered at `centres`.
+bool check(double r, pt &start, pt &end, vector<pt> &centres) {
+    // (5:54pm)
+    // Check end is right of start (or equal)
+    assert(end.x + EPS > start.x && abs(end.y - start.y) < EPS);
 
-    // Range [lo, hi]
-    // while (lo <= hi) {
-    /* 100 (/200) should be more than enough, could also use lo + eps < hi (?)*/
-    for (int i = 0; i < 100; i++) {
-        double mid = (lo + hi) / 2;
-        if (f(mid)) {
-            best_so_far = mid;
-            // hi = mid - 1;
-            hi = mid;
-        } else {
-            // lo = mid + 1;
-            lo = mid;
+    // ???: how to union intersections...? perhaps add to vector, sort? what on?
+    vector<pair<pt, pt>> intersections;
+    for (pt &c : centres) {
+        auto intersect = circle_line_intersection(start, end, c, r);
+
+        if (intersect.size() == 1) {
+            intersections.emplace_back(intersect[0], intersect[0]);
+        } else if (intersect.size() == 2) {
+            if (intersect[0].x > intersect[1].x) {
+                swap(intersect[0], intersect[1]);
+            }
+            intersections.emplace_back(intersect[0], intersect[1]);
         }
     }
-    return best_so_far;
-}
 
-bool check() {}
+    sort(all(intersections));
+    double seen_until = start.x;
+    for (const auto &[a, b] : intersections) {
+        // check same y-coordinate as start, & that a is left of b
+        assert(abs(a.y - start.y) < EPS && abs(b.y - start.y) < EPS);
+        assert(a.x + EPS < b.x);
+
+        if (seen_until + EPS < a.x) {
+            // gap in segment that's not covered (between seen_until & a.x)
+            return false;
+        }
+        seen_until = b.x;
+    }
+    return seen_until + EPS > end.x;
+}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    cout << fixed << setprecision(15);
 
     int n;
     cin >> n;
@@ -127,14 +150,37 @@ int main() {
     pt path = end - start;  // vector from start to end (move start to origin)
     double t = atan2(path.y, path.x);  // angle of end relative to start
 
-    // rotate all points clockwise by t so end is horizontally right of start
-    end = rotateCCW(end, -t);
-    for (auto &p : centres) p = rotateCCW(p, -t);
+    // rotate all points clockwise by t around start, so end is horizontally to
+    // the right of start
+    end = rotateCCW(end, -t, start);
+    for (auto &p : centres) p = rotateCCW(p, -t, start);
 
-    // TODO: binary search for smallest radii that covers the segment
+    // DONE: binary search for smallest radii that covers the segment
+    //  5:25pm... now ~~5:39pm~~ 5:47pm, finally got the binary search on reals?
+    //  https://codeforces.com/blog/entry/73888
+    //  https://codeforces.com/blog/entry/63085?#comment-470021
+    //? 2e5 should be large enough right?
+    double lo = 0, hi = 200200, best_so_far = -1;
 
-    // TODO: for a given radius, find circle-segment intersection for each dark
+    // Range [lo, hi]
+    // while (lo <= hi) {
+    /* 100 (/200) should be more than enough, could also use lo + eps < hi (?)*/
+    for (int i = 0; i < 100; i++) {
+        double mid = (lo + hi) / 2;
+        if (check(mid, start, end, centres)) {
+            best_so_far = mid;
+            // hi = mid - 1;
+            hi = mid;
+        } else {
+            // lo = mid + 1;
+            lo = mid;
+        }
+    }
+
+    // DONE: for a given radius, find circle-segment intersection for each dark
     // zone & check union of all of them = original segment (perhaps >=)
     //  - should be easier given the segment is now horizontal? take min of left
     //    points, max of right points
+
+    cout << best_so_far << '\n';
 }
