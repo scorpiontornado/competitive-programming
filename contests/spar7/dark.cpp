@@ -2,6 +2,11 @@
 //  - codebook code for distance from point (centre) to segment, or
 //  - codebook code for circle line intersection
 
+// 2025-09-14, midnight, finished off but WA on a huge case...
+//  - Expected: 68482.967174327369
+//  - Got: 99445.206586804401013
+// leave it, move on... still confused by flowers, maybe ask GPT... / codebook
+
 #include <bits/stdc++.h>
 using namespace std;
 

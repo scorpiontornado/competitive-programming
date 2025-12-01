@@ -1,0 +1,95 @@
+// Author: scorpiontornado
+// Created: 2025-09-207 11:30pm, 10 min left, go!!! gg...
+//          (started late & wasted lots of time...)
+// Problem: https://atcoder.jp/contests/abc425/tasks/abc425_d
+
+
+#pragma region template
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+using ld = long double;
+using uint = unsigned int;
+using ull = unsigned long long;
+using pii = pair<int, int>;
+using pll = pair<ll, ll>;
+using vi = vector<int>;
+using vll = vector<ll>;
+template <class T>
+using pq = priority_queue<T>;
+template <class T>
+using pq_min = priority_queue<T, vector<T>, greater<>>;
+
+#define rep(i, a, b) for (int i = (a); i < (b); ++i)
+#define repi(i, a, b) for (int i = (a); i <= (b); ++i)
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define sz(x) ((int)(x).size())
+#define pb emplace_back
+
+const int INF = 1e9;  // numeric_limits<int>::max();
+const ll LINF = 4e18;
+const double EPS = 1e-9;
+const int MOD = 1e9 + 7;
+#pragma endregion template
+
+void solve() {
+    int n, q;
+    cin >> n >> q;
+
+    // Both 1-indexed
+    vi a(n + 1);
+    vll pre(n + 1);
+    repi(i, 1, n) {
+        cin >> a[i];
+        pre[i] = a[i] + pre[i - 1];
+    }
+
+    int rot = 0;
+    repi(i, 1, q) {
+        int qtype;
+        cin >> qtype;
+
+        if (qtype == 1) {
+            int c;
+            cin >> c;
+            rot = (rot + c) % n;
+        } else {
+            int l, r;  // inclusive range of rotated array to sum
+            cin >> l >> r;
+            l += rot, r += rot;  //! had l twice, not r lol
+
+            // (could use % if was 0-indexed or manually -1, +1)
+            if (l > n) l -= n;
+            if (r > n) r -= n;
+
+            ll ans;
+            if (l > r) {
+                // split sum into two: A[l..n], and A[1..r]
+                ans = (pre[n] - pre[l - 1]) + pre[r];
+                // cerr << l << ' ' << r << ' ' << pre[l - 1] << ' ' << pre[r]
+                // << '\n'; //! dbg
+            } else {
+                // just use sum(A[l..r])
+                ans = pre[r] - pre[l - 1];
+                // cerr << l << ' ' << r << ' ' << pre[l - 1] << ' ' << pre[r]
+                // << '\n'; //! dbg
+            }
+            cout << ans << '\n';
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout << fixed << setprecision(15);
+
+    int t = 1;
+    // cin >> t;
+
+    while (t--) {
+        solve();
+    }
+}

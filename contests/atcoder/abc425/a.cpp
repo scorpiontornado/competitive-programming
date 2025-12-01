@@ -1,6 +1,10 @@
 // Author: scorpiontornado
-// Created: YYYY-MM-DD HH:MM
-// Problem:
+// Created: 2025-09-207 10:08pm
+// Problem: https://atcoder.jp/contests/abc425/tasks/abc425_a
+
+// Registered 40 seconds late (after 10:05pm), cause I was filling in personal
+// info for "UNIQUE VISION", some random Japanese company, rip... 10:10:00pm go!
+// 10:18pm, submit after rabbithole trying to figure out how to use pow on ints
 
 #pragma region template
 #include <bits/stdc++.h>
@@ -32,7 +36,17 @@ const double EPS = 1e-9;
 const int MOD = 1e9 + 7;
 #pragma endregion template
 
-void solve() {}
+void solve() {
+    int n;
+    cin >> n;
+
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        ans += round(pow(-1, i) * pow(i, 3));  // ??? pow is for floats/doubles?
+    }
+
+    cout << ans;
+}
 
 int main() {
     ios::sync_with_stdio(false);
