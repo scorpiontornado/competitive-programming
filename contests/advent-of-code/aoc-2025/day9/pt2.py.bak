@@ -1,0 +1,117 @@
+import math
+from itertools import combinations
+
+RED = "#"
+GREEN = "X"
+NEITHER = "."
+
+
+# Fill a vertical line vertically from (x, y) to (dst_x, dst_y) in green.
+# Excludes endpoints. Modifies grid.
+def fill_vert(x, y, dst_x, dst_y, grid):
+    assert x == dst_x
+
+    while y + 1 < dst_y:
+        y += 1
+        grid[y][x] = GREEN
+
+
+# Fill a horizontal line vertically from (x, y) to (dst_x, dst_y) in green.
+# Excludes endpoints. Modifies grid.
+def fill_hori(x, y, dst_x, dst_y, grid):
+    assert y == dst_y
+
+    while x + 1 < dst_x:
+        x += 1
+        grid[y][x] = GREEN
+
+
+# DFS, replaces grid[x][y] and neighbours with GREEN if grid[x][y] == NEITHER
+def flood_fill(x, y, grid):
+    if grid[x][y] != NEITHER:
+        return
+
+    grid[x][y] = GREEN
+
+    # (up, down, left, right)
+    dx = (0, 0, -1, 1)
+    dy = (-1, 1, 0, 0)
+
+    for d in range(4):
+        nx = x + dx[d]
+        ny = y + dy[d]
+
+        if nx < 0 or nx >= n_cols or ny < 0 or ny >= n_rows:
+            continue
+
+        flood_fill(nx, ny, grid)
+
+
+# Testing
+def print_grid(grid):
+    for row in grid:
+        print("".join(row))
+
+
+with open("input.txt") as f:
+    # List of (X, Y), i.e. (col, row), coordinates
+    reds = []
+    max_x, max_y = 0, 0
+
+    for l in f.readlines():
+        x, y = map(int, l.strip("\n").split(","))
+        reds.append([x, y])
+
+        max_x = max(x, max_x)
+        max_y = max(y, max_y)
+
+n = len(reds)
+n_rows = max_y + 1
+n_cols = max_x + 1
+
+print(n_rows, n_cols, reds)
+
+grid = [[NEITHER for _ in range(n_cols)] for _ in range(n_rows)]
+
+print_grid(grid)
+
+for i, cur in enumerate(reds):
+    nxt = reds[(i + 1) % n]
+
+    print(cur[0], cur[1])
+    print(grid[cur[1]])
+
+    grid[cur[1]][cur[0]] = RED
+    grid[nxt[1]][nxt[0]] = RED
+
+    x = min(cur[0], nxt[0])
+    y = min(cur[1], nxt[1])
+    dst_x = max(cur[0], nxt[0])
+    dst_y = max(cur[1], nxt[1])
+
+    # cur & next will be on same row or same col
+    if cur[0] == nxt[0]:
+        # same col (X), fill vertically in green
+        fill_vert(x, y, dst_x, dst_y, grid)
+    else:
+        assert cur[1] == nxt[1]
+        # same row (Y), fill horizontal in green
+        fill_hori(x, y, dst_x, dst_y, grid)
+
+
+print_grid(grid)  #! dbg
+
+flood_fill(grid)
+
+best = 0
+
+for a in range(n):
+    for b in range(a):  # avoid doing both ways (only connect directly once)
+        width = abs(reds[a][0] - reds[b][0]) + 1
+        height = abs(reds[a][1] - reds[b][1]) + 1
+        area = width * height
+
+        # TODO: only update if all in rectangle are red/green
+        best = max(best, area)
+
+print(best)

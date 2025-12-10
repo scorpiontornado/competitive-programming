@@ -1,0 +1,62 @@
+import logging
+from functools import cache
+
+# logging.basicConfig(level=logging.DEBUG)
+
+OFF = "."
+ON = "#"
+
+
+# Memoise function calls with cache to avoid repeated calculation (DP)
+# Tuples used because they're hashable
+@cache
+def min_presses(
+    cur: tuple[int, ...], desired: tuple[int, ...], buttons: tuple[tuple[int, ...], ...]
+) -> int | None:
+    """Given a bitmask 'cur' representing the current state of lights
+    (0 for off, 1 for on), a bitmask representing the desired state, and
+    a list of bitmasks of buttons (which lights to toggle), represents
+    the minimum number of button presses to reach 'desired'.
+    """
+    if cur == desired:
+        return 0
+
+    best = None
+    for counters in buttons:
+        nxt = tuple(cur[i] + int(i in counters) for i in range(len(cur)))
+
+        if any(x > y for x, y in zip(cur, desired)):
+            return None
+
+        n_presses = min_presses(nxt, desired, buttons)
+
+        if n_presses is None:
+            continue
+        elif best is None or n_presses + 1 < best:
+            best = n_presses + 1
+
+    return best
+
+
+with open("input.txt") as f:
+    machines = [l.strip("\n") for l in f.readlines()]
+
+total = 0
+
+for i, machine in enumerate(machines):
+    print(f"Machine {i}", end="\r")
+
+    tokens = machine.split()
+
+    buttons = []
+    for button in tokens[1:-1]:
+        buttons.append(tuple(int(x) for x in button[1:-1].split(",")))
+
+    desired = tuple(int(x) for x in tokens[-1][1:-1].split(","))
+    cur = tuple(0 for _ in range(len(desired)))
+
+    n_presses = min_presses(cur, desired, tuple(buttons))
+    assert n_presses is not None
+    total += n_presses
+
+print(total)
